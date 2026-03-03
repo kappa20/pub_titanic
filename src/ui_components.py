@@ -6,7 +6,7 @@ import pandas as pd
 
 from config.app_config import (
     DEFAULT_VALUES, CLASS_MAPPING, EMBARKATION_MAPPING,
-    COLOR_SUCCESS, COLOR_DANGER, VALIDATION_RANGES
+    COLOR_SUCCESS, COLOR_DANGER, VALIDATION_RANGES, FARE_RANGES_BY_CLASS
 )
 from src.model_utils import get_feature_explanation
 
@@ -23,22 +23,27 @@ def render_input_form():
     # Personal Information Section
     st.subheader("Personal Information")
 
-    # Title selection (replaces Name input)
-    title = st.selectbox(
-        "Title",
-        options=['Mr', 'Mrs', 'Miss', 'Master', 'Dr', 'Rev', 'Col', 'Major', 'Rare'],
-        index=0,
-        help="Social title - affects survival prediction"
-    )
-    # Create a dummy name with the selected title for feature engineering
-    passenger_data['Name'] = f"Passenger, {title}. Test"
-
     passenger_data['Sex'] = st.radio(
         "Sex",
         options=['male', 'female'],
         index=0 if DEFAULT_VALUES['sex'] == 'male' else 1,
         horizontal=True
     )
+
+    # Title options filtered by sex
+    if passenger_data['Sex'] == 'male':
+        title_options = ['Mr', 'Master', 'Dr', 'Rev', 'Col', 'Major', 'Rare']
+    else:
+        title_options = ['Mrs', 'Miss', 'Dr', 'Rare']
+
+    title = st.selectbox(
+        "Title",
+        options=title_options,
+        index=0,
+        help="Social title - affects survival prediction"
+    )
+    # Create a dummy name with the selected title for feature engineering
+    passenger_data['Name'] = f"Passenger, {title}. Test"
 
     passenger_data['Age'] = st.number_input(
         "Age",
@@ -56,6 +61,17 @@ def render_input_form():
         help="1st Class: Upper class, 2nd Class: Middle class, 3rd Class: Lower class"
     )
     passenger_data['Pclass'] = CLASS_MAPPING[pclass_display]
+
+    fare_min, fare_max, fare_default, fare_step, fare_hint = FARE_RANGES_BY_CLASS[passenger_data['Pclass']]
+    passenger_data['Fare'] = st.number_input(
+        "Ticket Fare (£)",
+        min_value=fare_min,
+        max_value=fare_max,
+        value=fare_default,
+        step=fare_step,
+        help=fare_hint
+    )
+    st.caption(f"Range for {pclass_display}: £{fare_min:.0f} – £{fare_max:.0f}")
 
     # Family Information Section
     st.subheader("Family Information")
@@ -82,15 +98,6 @@ def render_input_form():
 
     # Travel Details Section
     st.subheader("Travel Details")
-
-    passenger_data['Fare'] = st.number_input(
-        "Ticket Fare (£)",
-        min_value=0.0,
-        max_value=600.0,
-        value=DEFAULT_VALUES['fare'],
-        step=0.5,
-        help="Price paid for the ticket in British Pounds"
-    )
 
     passenger_data['Cabin'] = st.text_input(
         "Cabin (optional)",
