@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Activate the conda environment first
-conda activate python_3_10_ml
+conda activate python_3_11_13
 
 # Install dependencies (if needed)
 pip install -r requirements.txt
@@ -20,7 +20,8 @@ streamlit run app.py --server.enableCORS false --server.enableXsrfProtection fal
 
 ## Important Constraints
 
-- **scikit-learn is pinned to 1.3.2** in `requirements.txt` for Streamlit Cloud compatibility. Do not upgrade it without verifying the serialized model (`models/best_model.pkl`) remains loadable.
+- **Python 3.11.13** — The model is trained with Python 3.11.13 to match Streamlit Cloud's runtime. Use `conda activate python_3_11_13` to run the app locally.
+- **scikit-learn is pinned to 1.3.2** in `requirements.txt` for Streamlit Cloud compatibility. Do not upgrade it without retraining `models/best_model.pkl` with the new version.
 - The model file is a `GridSearchCV` object — `load_model()` in `src/model_utils.py` extracts the best estimator's pipeline components from it.
 
 ## Architecture

@@ -11,12 +11,23 @@ from src.feature_engineering import engineer_features
 from config.app_config import ALL_FEATURES
 
 
-# Compatibility shim for scikit-learn versions that removed _RemainderColsList
+# Compatibility shim for scikit-learn versions with different internal classes
 if not hasattr(ct, '_RemainderColsList'):
     class _RemainderColsList(list):
         """Compatibility class for older sklearn pickles."""
         pass
     ct._RemainderColsList = _RemainderColsList
+
+# Add _Scorer compatibility if missing
+try:
+    import sklearn.metrics._scorer as scorer_module
+    if not hasattr(scorer_module, '_Scorer'):
+        class _Scorer:
+            """Compatibility class for sklearn metrics._scorer."""
+            pass
+        scorer_module._Scorer = _Scorer
+except (ImportError, AttributeError):
+    pass
 
 
 def load_model(model_path):
