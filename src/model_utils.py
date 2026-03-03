@@ -5,9 +5,18 @@ import joblib
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import sklearn.compose._column_transformer as ct
 
 from src.feature_engineering import engineer_features
 from config.app_config import ALL_FEATURES
+
+
+# Compatibility shim for scikit-learn versions that removed _RemainderColsList
+if not hasattr(ct, '_RemainderColsList'):
+    class _RemainderColsList(list):
+        """Compatibility class for older sklearn pickles."""
+        pass
+    ct._RemainderColsList = _RemainderColsList
 
 
 def load_model(model_path):
