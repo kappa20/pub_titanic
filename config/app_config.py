@@ -87,6 +87,14 @@ VALIDATION_RANGES = {
     'fare': (0, 600),
 }
 
+# Fare ranges per passenger class (derived from training data)
+# Format: (min, max, default, step, help_hint)
+FARE_RANGES_BY_CLASS = {
+    1: (0.0, 513.0, 60.0, 1.0, "1st Class typical range: £26 – £233"),
+    2: (0.0,  74.0, 14.0, 0.5, "2nd Class typical range: £11 – £41"),
+    3: (0.0,  70.0,  8.0, 0.5, "3rd Class typical range: £7 – £40"),
+}
+
 # Feature names after preprocessing
 NUMERICAL_FEATURES = [
     'Pclass', 'Age', 'SibSp', 'Parch', 'Fare',
